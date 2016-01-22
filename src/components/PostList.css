@@ -1,0 +1,7 @@
+.post-item {
+  cursor: pointer;
+}
+
+.post-item:hover {
+  color: blue;
+}
