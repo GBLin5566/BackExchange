@@ -41,6 +41,7 @@ const initialState = {
         ],
     currentUser: {
         id: '',
+        threadIndex: '',
         name: '',
         description: '',
         profilePic: '',
@@ -111,22 +112,63 @@ export default class App extends Component {
             currentUser:{
                     id: response.id,
                     name: response.name,
-                    profilePic: self.state.currentUser.profilePic
+                    profilePic: self.state.currentUser.profilePic,
+                    threadIndex: self.state.currentUser.threadIndex
                         }
         });
+        for (let userIndex = 0 ; userIndex < self.state.userThread.length ; userIndex ++){ 
+            if (self.state.userThread[userIndex].id === self.state.currentUser.id){
+                console.log('Find exists user ' + userIndex);
+                self.setState({
+                    currentUser:{
+                            id: self.state.currentUser.id,
+                            name: self.state.currentUser.name,
+                            profilePic: self.state.currentUser.profilePic,
+                            threadIndex: userIndex
+                                }
+                });
+                break;
+            }
         }
+        // Add the new user to the userThread
+        if (self.state.currentUser.threadIndex === ''){
+            self.state.userThread.push({
+                id: self.state.currentUser.id,
+                profile: {
+                    name: self.state.currentUser.name,
+                    description: '',
+                    profilePic: self.state.currentUser.profilePic,
+                    intersted: ''
+                },
+                home: [],
+                friendList:[]
+            });
+            self.setState({
+                currentUser:{
+                        id: self.state.currentUser.id,
+                        name: self.state.currentUser.name,
+                        profilePic: self.state.currentUser.profilePic,
+                        threadIndex: self.state.userThread.length - 1
+                            }
+            });
+            console.log('Add a new user to array index ' + self.state.currentUser.threadIndex);
+        }
+        //
+        }
+      });
       FB.api('/me/picture?type=large', function(response){
           if(response && ! response.error) {
               self.setState({
                   currentUser:{
                         id: self.state.currentUser.id,
                         name: self.state.currentUser.name,
-                        profilePic: response.data.url
+                        profilePic: response.data.url,
+                        threadIndex: self.state.currentUser.threadIndex
                             }
               });
           }
       });
-      });
+      
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
         console.log('Plz log into this app');
@@ -158,6 +200,7 @@ export default class App extends Component {
       }
       else{
         FB.login(self.checkLoginState.bind(self));
+
       }
     });
   }

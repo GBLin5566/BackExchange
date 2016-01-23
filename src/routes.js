@@ -4,7 +4,6 @@ import App from './components/App';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import FriendList from './components/FriendList';
-import SinglePost from './components/SinglePost';
 import NotFound from './components/NotFound';
 
 

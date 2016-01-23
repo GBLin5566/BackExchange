@@ -9,7 +9,7 @@ export default class FriendList extends Component {
     renderMSG(item, i) {
         const {id, userId, msg} = item;
         return(
-                <div className='FriendItem'>
+                <div className='FriendItem' key={i}>
                     <FriendItem 
                         key={i}
                         id={id}
@@ -22,7 +22,7 @@ export default class FriendList extends Component {
     render() {
         return(
                 <div className='FriendList'>
-                    <p>{this.props.thread[0].friendList.map(this.renderMSG, this)}</p>
+                    {this.props.thread[0].friendList.map(this.renderMSG, this)}
                 </div>
                 );
     }
