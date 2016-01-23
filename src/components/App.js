@@ -5,7 +5,7 @@ const initialState = {
     userThread: 
         [
                 {
-                    id: '3345678',
+                    id: '1125782024133293',
                     profile: {
                               name: 'GBLin',
                               description: 'Tainan Boy',
@@ -38,7 +38,14 @@ const initialState = {
                         }
                         ]
                 }
-        ]
+        ],
+    currentUser: {
+        id: '',
+        name: '',
+        description: '',
+        profilePic: '',
+        intersted: ''
+    }
 };
 
 export default class App extends Component {
@@ -87,28 +94,39 @@ export default class App extends Component {
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
   }
-
-  // Here we run a very simple test of the Graph API after login is
-  // successful.  See statusChangeCallback() for when this call is made.
-  testAPI() {
-    console.log('Welcome!  Fetching your information.... ');
-    FB.api('/me', function(response) {
-    console.log('Successful login for: ' + response.name);
-    console.log('Successful login for: ' + response.id);
-    });
-  }
-
   // This is called with the results from from FB.getLoginStatus().
   statusChangeCallback(response) {
-    console.log('statusChangeCallback');
-    console.log(response);
     // The response object is returned with a status field that lets the
     // app know the current login status of the person.
     // Full docs on the response object can be found in the documentation
     // for FB.getLoginStatus().
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
-      this.testAPI();
+      console.log('Welcome! Fetching your information.... ');
+      let self = this;
+      FB.api('/me', function(response){
+        if (response && !response.error){
+        console.log('Successful login for: ' + response.name);
+        self.setState({
+            currentUser:{
+                    id: response.id,
+                    name: response.name,
+                    profilePic: self.state.currentUser.profilePic
+                        }
+        });
+        }
+      FB.api('/me/picture?type=large', function(response){
+          if(response && ! response.error) {
+              self.setState({
+                  currentUser:{
+                        id: self.state.currentUser.id,
+                        name: self.state.currentUser.name,
+                        profilePic: response.data.url
+                            }
+              });
+          }
+      });
+      });
     } else if (response.status === 'not_authorized') {
       // The person is logged into Facebook, but not your app.
         console.log('Plz log into this app');
@@ -133,6 +151,8 @@ export default class App extends Component {
     FB.getLoginStatus(function(response){
       if(response.status === 'connected'){
         FB.logout(function(response){
+        // clear the data
+        self.setState(initialState);
         console.log('User Logout');
       });
       }
@@ -167,7 +187,7 @@ export default class App extends Component {
                 <li><IndexLink to="/" activeClassName="active">Home</IndexLink></li>
                 <li><Link to="/profile" activeClassName="active">Profile</Link></li>
                 <li><Link to="/friends" activeClassName="active">Friends</Link></li>
-                <li><a href='#' onClick={this.handleClick.bind(this)}>Login</a></li>
+                <li><a href='#' onClick={this.handleClick.bind(this)}>{`${this.state.currentUser.id ? 'Logout' : 'Login' }`}</a></li>
               </ul>
             </div>
           </div>
@@ -175,7 +195,9 @@ export default class App extends Component {
         {/* this will render the child routes */}
         <div className="container">
           {this.props.children && React.cloneElement(this.props.children, {
-            thread: this.state.userThread
+            thread: this.state.userThread,
+            user: this.state.currentUser
+
                                                                             })}
         </div>
       </div>
