@@ -4,8 +4,9 @@ import { IndexLink, Link } from 'react-router';
 const initialState = {
     userThread: 
         [
-                {
-                    id: '1125782024133293',
+                /*{
+                    
+                    id: '',
                     profile: {
                               name: 'GBLin',
                               description: 'Tainan Boy',
@@ -37,7 +38,7 @@ const initialState = {
                                 ]
                         }
                         ]
-                }
+                }*/
         ],
     currentUser: {
         id: '',
