@@ -9,11 +9,10 @@ export default class FriendItem extends Component {
                 );
     }
     render(){
-        const {id, userId, msg} = this.props;
+        const {key, id, name,profilePic, msg} = this.props;
         return(
                 <div className='friendItem'>
-                    <h3>{id}</h3>
-                    <p>To {userId}</p>
+                    <h3>To {name}</h3>
                     {msg.map(this.renderMSG, this)}
                 </div>
                 );

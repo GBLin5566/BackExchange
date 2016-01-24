@@ -7,13 +7,14 @@ export default class FriendList extends Component {
     }
 
     renderMSG(item, i) {
-        const {id, userId, msg} = item;
+        const {id, name,profilePic, msg} = item;
         return(
-                <div className='FriendItem' key={i}>
+                <div className='FriendItem panel panel-success' key={i}>
                     <FriendItem 
                         key={i}
                         id={id}
-                        userId={userId}
+                        name={name}
+                        profilePic={profilePic}
                         msg={msg}
                     />
                 </div>

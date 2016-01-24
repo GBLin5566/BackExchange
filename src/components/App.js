@@ -4,26 +4,19 @@ import { IndexLink, Link } from 'react-router';
 const initialState = {
     userThread: 
         [
-                /*{
+                {
                     
-                    id: '',
+                    id: '1125782029',
                     profile: {
-                              name: 'GBLin',
-                              description: 'Tainan Boy',
-                              profilePic: 'https://scontent-tpe1-1.xx.fbcdn.net/hphotos-xaf1/v/t1.0-9/11855831_1075120949199401_2404189872865217435_n.jpg?oh=a72522e249e450d9310c10ea4ee3fc20&oe=57471C0B',
-                              intersted: 'Everywhere'
+                              name: 'John',
+                              description: 'Want to visit Asia',
+                              profilePic: 'http://api.randomuser.me/portraits/men/49.jpg',
+                              intersted: 'Couchsurfing'
                           },
-                    home: [
-                        {
-                            id: '2345124',
-                            name: 'John',
-                            intersted: 'Tainan'
-                        }
-                        ],
                     friendList: [
                         {
                             id: '1',
-                            userId: '2343452',
+                            name: 'DDD',
                             msg: [
                             {fromMe: false, text: 'Hello'},
                             {fromMe: true, text: 'From the other side'}
@@ -31,14 +24,24 @@ const initialState = {
                         },
                         {
                             id: '2',
-                            userId: '2564345',
+                            name: 'SDF',
                             msg: [
                             {fromMe: false, text: 'Demo?'},
                             {fromMe: true, text: 'Sure'}
                                 ]
                         }
                         ]
-                }*/
+                },
+                {
+                    id: '23',
+                    profile: {
+                        name: 'James',
+                        description: 'Legs',
+                        profilePic: 'http://l1.yimg.com/bt/api/res/1.2/a3msGgStarpOr9C2Gaygnw--/YXBwaWQ9eW5ld3NfbGVnbztpbD1wbGFuZTtxPTc1O3c9NjAw/http://media.zenfs.com/en/person/Ysports/lebron-james-basketball-headshot-photo.jpg',
+                        intersted: 'rings'
+                    },
+                    friendList:[]
+                }
         ],
     currentUser: {
         id: '',
@@ -61,6 +64,7 @@ export default class App extends Component {
     this.state = initialState;
   }
 
+  // Facebook API
   componentDidMount() {
     window.fbAsyncInit = function() {
       FB.init({
@@ -125,6 +129,8 @@ export default class App extends Component {
                             id: self.state.currentUser.id,
                             name: self.state.currentUser.name,
                             profilePic: self.state.currentUser.profilePic,
+                            intersted: self.state.userThread[userIndex].intersted,
+                            description: self.state.userThread[userIndex].description,
                             threadIndex: userIndex
                                 }
                 });
@@ -206,6 +212,24 @@ export default class App extends Component {
     });
   }
 
+  // API Ends
+  handleAddPeople(i){
+    // Add a friend
+    let thread = this.state.userThread;
+
+    // Add a user into currentUser's data
+    thread[this.state.currentUser.threadIndex].friendList.push({
+        id: thread[i].id,
+        name: thread[i].profile.name,
+        profilePic: thread[i].profile.profilePic,
+        msg: []
+    });
+
+    this.setState({
+        userThread: thread
+    });
+  }
+
   render() {
     return (
       <div>
@@ -240,7 +264,8 @@ export default class App extends Component {
         <div className="container">
           {this.props.children && React.cloneElement(this.props.children, {
             thread: this.state.userThread,
-            user: this.state.currentUser
+            user: this.state.currentUser,
+            handleAddPeople: this.handleAddPeople.bind(this)
 
                                                                             })}
         </div>
