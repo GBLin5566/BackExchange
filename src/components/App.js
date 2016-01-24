@@ -50,6 +50,11 @@ const initialState = {
         description: '',
         profilePic: '',
         intersted: ''
+    },
+    tmpValue: {
+        tmpInterested: '',
+        tmpDescription: '',
+        tmpMsg: ''
     }
 };
 
@@ -147,7 +152,6 @@ export default class App extends Component {
                     profilePic: self.state.currentUser.profilePic,
                     intersted: ''
                 },
-                home: [],
                 friendList:[]
             });
             self.setState({
@@ -230,6 +234,65 @@ export default class App extends Component {
     });
   }
 
+  handleInterestChange(event){
+      this.setState({
+        tmpValue:{
+            tmpInterested: event.target.value
+            }
+      });
+  }
+
+  handleDescriptionChange(event){
+      this.setState({
+         tmpValue:{
+             tmpDescription: event.target.value
+                  }
+      });
+  }
+
+  handleInterest(event){
+      const inputValue = event.target.value;
+      if (event.keyCode == 13 && inputValue !== ''){
+          let thread = this.state.userThread;
+          thread[this.state.currentUser.threadIndex].profile.intersted = inputValue;
+          this.setState({
+            userThread: thread,
+            currentUser:{
+                    id: this.state.currentUser.id,
+                    threadIndex: this.state.currentUser.threadIndex,
+                    description: this.state.currentUser.description,
+                    profilePic: this.state.currentUser.profilePic,
+                    name: this.state.currentUser.name,
+                    intersted: inputValue
+                        },
+            tmpValue:{
+                    tmpInterested: ''
+                     }
+          });
+      }
+  }
+  handleDescription(event){
+      const inputValue = event.target.value;
+      if (event.keyCode == 13 && inputValue !== ''){
+        let thread = this.state.userThread;
+        thread[this.state.currentUser.threadIndex].profile.description = inputValue;
+        this.setState({
+            userThread: thread,
+            currentUser: {
+                    id: this.state.currentUser.id,
+                    threadIndex: this.state.currentUser.threadIndex,
+                    description: inputValue,
+                    profilePic: this.state.currentUser.profilePic,
+                    name: this.state.currentUser.name,
+                    intersted: this.state.currentUser.intersted
+            },
+            tmpValue:{
+                    tmpDescription: ''
+                     }
+        });
+      }
+  }
+
   render() {
     return (
       <div>
@@ -265,8 +328,12 @@ export default class App extends Component {
           {this.props.children && React.cloneElement(this.props.children, {
             thread: this.state.userThread,
             user: this.state.currentUser,
-            handleAddPeople: this.handleAddPeople.bind(this)
-
+            tmpValue: this.state.tmpValue,
+            handleAddPeople: this.handleAddPeople.bind(this),
+            handleInterest: this.handleInterest.bind(this),
+            handleInterestChange: this.handleInterestChange.bind(this),
+            handleDescription: this.handleDescription.bind(this),
+            handleDescriptionChange: this.handleDescriptionChange.bind(this)
                                                                             })}
         </div>
       </div>
