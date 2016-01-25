@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import { IndexLink, Link } from 'react-router';
 
+
 const initialState = {
     userThread: 
         [
-                {
+                /*{
                     
                     id: '1125782029',
                     profile: {
@@ -41,7 +42,7 @@ const initialState = {
                         intersted: 'rings'
                     },
                     friendList:[]
-                }
+                }*/
         ],
     currentUser: {
         id: '',
@@ -129,6 +130,10 @@ export default class App extends Component {
         for (let userIndex = 0 ; userIndex < self.state.userThread.length ; userIndex ++){ 
             if (self.state.userThread[userIndex].id === self.state.currentUser.id){
                 console.log('Find exists user ' + userIndex);
+                let tmpList = []
+                for (let index = 0; index < self.state.userThread[userIndex].friendList.length; index++){
+                    tmpList.push('');
+                }
                 self.setState({
                     currentUser:{
                             id: self.state.currentUser.id,
@@ -137,14 +142,20 @@ export default class App extends Component {
                             intersted: self.state.userThread[userIndex].intersted,
                             description: self.state.userThread[userIndex].description,
                             threadIndex: userIndex
-                                }
+                                },
+                    tmpValue:{
+                            tmpDescription: '',
+                            tmpInterested: '',
+                            tmpMsg: tmpList
+                             }
                 });
                 break;
             }
         }
         // Add the new user to the userThread
         if (self.state.currentUser.threadIndex === ''){
-            self.state.userThread.push({
+            let tmpThread = self.state.userThread;
+            tmpThread.push({
                 id: self.state.currentUser.id,
                 profile: {
                     name: self.state.currentUser.name,
@@ -155,6 +166,7 @@ export default class App extends Component {
                 friendList:[]
             });
             self.setState({
+                userThread: tmpThread,
                 currentUser:{
                         id: self.state.currentUser.id,
                         name: self.state.currentUser.name,
@@ -169,7 +181,10 @@ export default class App extends Component {
       });
       FB.api('/me/picture?type=large', function(response){
           if(response && ! response.error) {
+          	  let thread = self.state.userThread;
+          	  thread[self.state.currentUser.threadIndex].profile.profilePic = response.data.url;
               self.setState({
+              	  userThread: thread,
                   currentUser:{
                         id: self.state.currentUser.id,
                         name: self.state.currentUser.name,
@@ -177,6 +192,7 @@ export default class App extends Component {
                         threadIndex: self.state.currentUser.threadIndex
                             }
               });
+
           }
       });
       
@@ -237,16 +253,27 @@ export default class App extends Component {
         msg: []
     });
 
+    let tmpList = []
+    for(let index = 0 ; index < thread[this.state.currentUser.threadIndex].friendList.length; index++){
+        tmpList.push('');
+    }
 
     this.setState({
-        userThread: thread
+        userThread: thread,
+        tmpValue:{
+            tmpInterested: '',
+            tmpDescription: '',
+            tmpMsg: tmpList
+        }
     });
   }
 
   handleInterestChange(event){
       this.setState({
         tmpValue:{
-            tmpInterested: event.target.value
+            tmpInterested: event.target.value,
+            tmpDescription: this.state.tmpValue.tmpDescription,
+            tmpMsg: this.state.tmpValue.tmpMsg
             }
       });
   }
@@ -254,9 +281,62 @@ export default class App extends Component {
   handleDescriptionChange(event){
       this.setState({
          tmpValue:{
-             tmpDescription: event.target.value
+             tmpInterested: this.state.tmpValue.tmpInterested,
+             tmpDescription: event.target.value,
+             tmpMsg: this.state.tmpValue.tmpMsg
                   }
       });
+  }
+
+  handleMSGChange(i, event){
+      let list = this.state.tmpValue.tmpMsg;
+      list[i] = event.target.value;
+      this.setState({
+         tmpValue:{
+             tmpInterested: this.state.tmpValue.tmpInterested,
+             tmpDescription: this.state.tmpValue.tmpDescription,
+             tmpMsg: list 
+            }
+      });
+  }
+
+  handleMSG(i, event){
+      const inputValue = event.target.value;
+      if (event.keyCode == 13 && inputValue !== ''){
+         let thread = this.state.userThread;
+         let user = this.state.currentUser;
+         let fId = thread[this.state.currentUser.threadIndex].friendList[i].id
+         thread[this.state.currentUser.threadIndex].friendList[i].msg.push({
+            fromMe: true,
+            text: inputValue
+         });
+         // Set talk
+         for (let index = 0 ; index < thread.length ; index++){
+            if(thread[index].id === fId){
+                for (let jndex = 0 ; jndex < thread[index].friendList.length; jndex++){
+                    if (thread[index].friendList[jndex].id === user.id){
+                        thread[index].friendList[jndex].msg.push({
+                            fromMe: false,
+                            text: inputValue
+                        });
+                        break;
+                    }
+                }
+                break;
+            }
+         }
+         let tmpList = this.state.tmpValue.tmpMsg;
+         tmpList[i] = '';
+         this.setState({
+            userThread: thread,
+            currentUser: user,
+            tmpValue:{
+                tmpInterested: this.state.tmpValue.tmpInterested,
+                tmpDescription: this.state.tmpValue.tmpDescription,
+                tmpMsg: tmpList
+            }
+         });
+      }
   }
 
   handleInterest(event){
@@ -275,7 +355,9 @@ export default class App extends Component {
                     intersted: inputValue
                         },
             tmpValue:{
-                    tmpInterested: ''
+                    tmpDescription: this.state.tmpValue.tmpDescription,
+                    tmpInterested: '',
+                    tmpMsg: this.state.tmpValue.tmpMsg
                      }
           });
       }
@@ -296,10 +378,17 @@ export default class App extends Component {
                     intersted: this.state.currentUser.intersted
             },
             tmpValue:{
-                    tmpDescription: ''
+                    tmpInterested: this.state.tmpValue.tmpInterested,
+                    tmpDescription: '',
+                    tmpMsg: this.state.tmpValue.tmpMsg
                      }
         });
       }
+  }
+
+  // RESET
+  resetInit(){
+    this.setState(initialState);
   }
 
   render() {
@@ -328,6 +417,7 @@ export default class App extends Component {
                 <li><Link to="/profile" activeClassName="active">Profile</Link></li>
                 <li><Link to="/friends" activeClassName="active">Friends</Link></li>
                 <li><a href='#' onClick={this.handleClick.bind(this)}>{`${this.state.currentUser.id ? 'Logout' : 'Login' }`}</a></li>
+                <li><button type="button" onClick={this.resetInit.bind(this)}>Reset</button></li>
               </ul>
             </div>
           </div>
@@ -342,7 +432,9 @@ export default class App extends Component {
             handleInterest: this.handleInterest.bind(this),
             handleInterestChange: this.handleInterestChange.bind(this),
             handleDescription: this.handleDescription.bind(this),
-            handleDescriptionChange: this.handleDescriptionChange.bind(this)
+            handleDescriptionChange: this.handleDescriptionChange.bind(this),
+            handleMSG: this.handleMSG.bind(this),
+            handleMSGChange: this.handleMSGChange.bind(this)
                                                                             })}
         </div>
       </div>

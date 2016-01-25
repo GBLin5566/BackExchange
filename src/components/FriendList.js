@@ -12,10 +12,14 @@ export default class FriendList extends Component {
                 <div className='FriendItem panel panel-success' key={i}>
                     <FriendItem 
                         key={i}
+                        index={i}
                         id={id}
                         name={name}
                         profilePic={profilePic}
                         msg={msg}
+                        place={this.props.tmpValue.tmpMsg[i]}
+                        handleMSG={this.props.handleMSG.bind(this)}
+                        handleMSGChange={this.props.handleMSGChange.bind(this)}
                     />
                 </div>
                 );
