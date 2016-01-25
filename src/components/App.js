@@ -54,7 +54,7 @@ const initialState = {
     tmpValue: {
         tmpInterested: '',
         tmpDescription: '',
-        tmpMsg: ''
+        tmpMsg: []
     }
 };
 
@@ -228,6 +228,15 @@ export default class App extends Component {
         profilePic: thread[i].profile.profilePic,
         msg: []
     });
+
+    // Add currentUser's data into the user's data
+    thread[i].friendList.push({
+        id: this.state.currentUser.id,
+        name: this.state.currentUser.name,
+        profilePic: this.state.currentUser.profilePic,
+        msg: []
+    });
+
 
     this.setState({
         userThread: thread

@@ -4,6 +4,7 @@ import { Router } from 'react-router';
 import createBrowserHistory from 'history/lib/createBrowserHistory';
 import routes from './routes';
 
+const css = require('./components/mine.css');
 
 const history = createBrowserHistory();
 
